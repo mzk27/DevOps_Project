@@ -4,31 +4,31 @@ pipeline {
     stages {
         stage('Install Dependencies') {
             steps {
-                ansiblePlaybook playbook: 'install_dependencies.yml'
+                ansiblePlaybook playbook: '/var/lib/jenkins/workspace/my_lb_site/ansible/install_dependencies.yml'
             }
         }
 
         stage('Prepare Directories') {
             steps {
-                ansiblePlaybook playbook: 'prepare_directories.yml'
+                ansiblePlaybook playbook: '/var/lib/jenkins/workspace/my_lb_site/ansible/prepare_directories.yml'
             }
         }
 
         stage('Copy Files') {
             steps {
-                ansiblePlaybook playbook: 'copy_files.yml'
+                ansiblePlaybook playbook: '/var/lib/jenkins/workspace/my_lb_site/ansible/copy_files.yml'
             }
         }
 
         stage('Generate HTML') {
             steps {
-                ansiblePlaybook playbook: 'generate_html.yml'
+                ansiblePlaybook playbook: '/var/lib/jenkins/workspace/my_lb_site/ansible/generate_html.yml'
             }
         }
 
         stage('Deploy Containers') {
             steps {
-                ansiblePlaybook playbook: 'deploy_containers.yml'
+                ansiblePlaybook playbook: '/var/lib/jenkins/workspace/my_lb_site/ansible/deploy_containers.yml'
             }
         }
 
