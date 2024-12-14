@@ -4,7 +4,7 @@
   hosts: test
   become: true
   vars:
-    master_dir: "var/lib/jenkins/workspace/my_lb_site"
+    master_dir: "/var/lib/jenkins/workspace/my_lb_site"
     node_dir: "/home/ad_zabbix63/DevOps_Project"
     script_dir: "{{ node_dir }}/shell_scripts"
     docker_files:
