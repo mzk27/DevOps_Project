@@ -1,0 +1,13 @@
+# deploy_containers.yml
+---
+- name: Deploy Containers
+  hosts: test
+  become: true
+  vars:
+    node_dir: "/home/ad_zabbix63/DevOps_Project"
+  tasks:
+    - name: Deploy containers
+      ansible.builtin.command:
+        cmd: docker-compose up -d
+      args:
+        chdir: "{{ node_dir }}"

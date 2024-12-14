@@ -1,0 +1,41 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Install Dependencies') {
+            steps {
+                ansiblePlaybook playbook: 'install_dependencies.yml'
+            }
+        }
+
+        stage('Prepare Directories') {
+            steps {
+                ansiblePlaybook playbook: 'prepare_directories.yml'
+            }
+        }
+
+        stage('Copy Files') {
+            steps {
+                ansiblePlaybook playbook: 'copy_files.yml'
+            }
+        }
+
+        stage('Generate HTML') {
+            steps {
+                ansiblePlaybook playbook: 'generate_html.yml'
+            }
+        }
+
+        stage('Deploy Containers') {
+            steps {
+                ansiblePlaybook playbook: 'deploy_containers.yml'
+            }
+        }
+
+        stage('Verify Setup') {
+            steps {
+                sh 'curl -I http://test.mzkhan.pro'
+            }
+        }
+    }
+}

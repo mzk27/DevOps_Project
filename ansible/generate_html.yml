@@ -1,0 +1,11 @@
+# generate_html.yml
+---
+- name: Generate Sample Index HTML File
+  hosts: test
+  become: true
+  vars:
+    script_dir: "/home/ad_zabbix63/DevOps_Project/shell_scripts"
+  tasks:
+    - name: Run script that will generate sample index.html file
+      ansible.builtin.shell:
+        cmd: "/bin/bash {{ script_dir }}/sample_html.sh"

@@ -1,0 +1,26 @@
+# prepare_directories.yml
+---
+- name: Prepare Directories for Deployment
+  hosts: test
+  become: true
+  vars:
+    node_dir: "/home/ad_zabbix63/DevOps_Project"
+    script_dir: "{{ node_dir }}/shell_scripts"
+  tasks:
+    - name: Create required directories for the deployment
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ node_dir }}"
+        - "{{ node_dir }}/containers"
+        - "{{ node_dir }}/shell_scripts"
+
+    - name: Create directories for the Containers
+      ansible.builtin.file:
+        path: "{{ node_dir }}/containers/site{{ item }}"
+        state: directory
+      with_items:
+        - 1
+        - 2
+        - 3

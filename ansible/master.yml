@@ -1,0 +1,91 @@
+---
+- name: Playbook to deploy multiple containers
+  hosts: test
+  become: true
+  vars: 
+    master_dir: "var/lib/jenkins/workspace/my_lb_site/DevOps_Project"
+    node_dir: "/home/ad_zabbix63/DevOps_Project"
+    script_dir: "{{ node_dir }}/shell_scripts"
+    docker_files:
+      - src: "{{ master_dir }}/Dockerfile"
+        dest: "{{ node_dir }}/Dockerfile"
+      - src: "{{ master_dir }}/docker-compose.yml"
+        dest: "{{ node_dir }}/docker-compose.yml"
+
+  tasks:
+    - name: Update package repository
+      ansible.builtin.apt: 
+        update_cache: yes
+
+    - name: Install Nginx, Docker, and Docker-Compose
+      ansible.builtin.apt: 
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - nginx
+        - docker.io
+        - docker-compose
+
+    - name: Ensure Nginx and Docker service is enabled and running
+      ansible.builtin.service:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+      with_items:
+        - nginx
+        - docker
+
+    - name: Add current user to Docker group
+      ansible.builtin.user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+
+    - name: Create required directories for the deployment
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ node_dir }}"
+        - "{{ node_dir }}/containers"
+        - "{{ node_dir }}/shell_scripts"
+
+    - name: Create directories for the Containers
+      ansible.builtin.file:
+        path: "{{ node_dir }}/containers/site{{ item }}"
+        state: directory
+      with_items:
+        - 1
+        - 2
+        - 3
+
+    - name: Copy script that will generate sample index.html file
+      ansible.builtin.copy:
+        src: "{{ master_dir }}/shell_scripts/sample_landing_page.sh"
+        dest: "{{ script_dir }}/sample_landing_page.sh"
+        mode: '0755'
+
+    - name: Run script that will generate sample index.html file
+      ansible.builtin.shell:
+        cmd: "/bin/bash {{ script_dir }}/sample_landing_page.sh"
+
+    - name: Copy Docker files on remote server
+      ansible.builtin.copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+      with_items:
+        - "{{ docker_files }}"
+
+    - name: Copy nginx.conf to the conf.d directory
+      ansible.builtin.copy:
+        src: "{{ master_dir }}/sample_nginx.conf"
+        dest: "/etc/nginx/conf.d/my_lb_site.conf"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Deploy containers
+      ansible.builtin.command: 
+        cmd: docker-compose up -d
+      args:
+        chdir: "{{ node_dir }}"

@@ -1,0 +1,39 @@
+# copy_files.yml
+---
+- name: Copy Files for Deployment
+  hosts: test
+  become: true
+  vars:
+    master_dir: "var/lib/jenkins/workspace/my_lb_site/DevOps_Project"
+    node_dir: "/home/ad_zabbix63/DevOps_Project"
+    script_dir: "{{ node_dir }}/shell_scripts"
+    docker_files:
+      - src: "{{ master_dir }}/Dockerfile"
+        dest: "{{ node_dir }}/containers/site1/Dockerfile"
+      - src: "{{ master_dir }}/Dockerfile"
+        dest: "{{ node_dir }}/containers/site2/Dockerfile"
+      - src: "{{ master_dir }}/Dockerfile"
+        dest: "{{ node_dir }}/containers/site3/Dockerfile"
+      - src: "{{ master_dir }}/docker-compose.yml"
+        dest: "{{ node_dir }}/docker-compose.yml"
+  tasks:
+    - name: Copy script that will generate sample index.html file
+      ansible.builtin.copy:
+        src: "{{ master_dir }}/shell_scripts/sample_html.sh"
+        dest: "{{ script_dir }}/sample_html.sh"
+        mode: '0755'
+
+    - name: Copy Docker files on remote server
+      ansible.builtin.copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        mode: '0644'
+      with_items: "{{ docker_files }}"
+
+    - name: Copy nginx.conf to the test server
+      ansible.builtin.copy:
+        src: "{{ master_dir }}/sample_nginx.conf"
+        dest: "{{ node_dir }}/sample_nginx.conf"
+        owner: root
+        group: root
+        mode: '0644'
