@@ -1,34 +1,48 @@
 pipeline {
     agent any
 
+    environment {
+        ANSIBLE_CONFIG = '/var/lib/jenkins/.ansible/ansible.cfg'
+    }
+
     stages {
         stage('Install Dependencies') {
             steps {
-                ansiblePlaybook playbook: '/var/lib/jenkins/workspace/my_lb_site/ansible/install_dependencies.yml'
+                withEnv(["ANSIBLE_CONFIG=$ANSIBLE_CONFIG"]) {
+                    ansiblePlaybook playbook: '/var/lib/jenkins/workspace/my_lb_site/ansible/install_dependencies.yml'
+                }
             }
         }
 
         stage('Prepare Directories') {
             steps {
-                ansiblePlaybook playbook: '/var/lib/jenkins/workspace/my_lb_site/ansible/prepare_directories.yml'
+                withEnv(["ANSIBLE_CONFIG=$ANSIBLE_CONFIG"]) {
+                    ansiblePlaybook playbook: '/var/lib/jenkins/workspace/my_lb_site/ansible/prepare_directories.yml'
+                }
             }
         }
 
         stage('Copy Files') {
             steps {
-                ansiblePlaybook playbook: '/var/lib/jenkins/workspace/my_lb_site/ansible/copy_files.yml'
+                withEnv(["ANSIBLE_CONFIG=$ANSIBLE_CONFIG"]) {
+                    ansiblePlaybook playbook: '/var/lib/jenkins/workspace/my_lb_site/ansible/copy_files.yml'
+                }
             }
         }
 
         stage('Generate HTML') {
             steps {
-                ansiblePlaybook playbook: '/var/lib/jenkins/workspace/my_lb_site/ansible/generate_html.yml'
+                withEnv(["ANSIBLE_CONFIG=$ANSIBLE_CONFIG"]) {
+                    ansiblePlaybook playbook: '/var/lib/jenkins/workspace/my_lb_site/ansible/generate_html.yml'
+                }
             }
         }
 
         stage('Deploy Containers') {
             steps {
-                ansiblePlaybook playbook: '/var/lib/jenkins/workspace/my_lb_site/ansible/deploy_containers.yml'
+                withEnv(["ANSIBLE_CONFIG=$ANSIBLE_CONFIG"]) {
+                    ansiblePlaybook playbook: '/var/lib/jenkins/workspace/my_lb_site/ansible/deploy_containers.yml'
+                }
             }
         }
 
